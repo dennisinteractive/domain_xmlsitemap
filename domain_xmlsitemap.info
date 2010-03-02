@@ -1,0 +1,7 @@
+; $Id$
+name = XML sitemap domain
+description = Provides domain contexts for XML sitemaps.
+package = XML sitemap
+core = 6.x
+dependencies[] = xmlsitemap
+dependencies[] = domain
