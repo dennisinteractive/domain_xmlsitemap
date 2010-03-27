@@ -2,6 +2,7 @@
 name = XML sitemap domain
 description = Provides domain contexts for XML sitemaps.
 package = XML sitemap
-core = 6.x
+core = 7.x
 dependencies[] = xmlsitemap
 dependencies[] = domain
+files[] = domain_xmlsitemap.module
