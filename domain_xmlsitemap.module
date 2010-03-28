@@ -32,23 +32,24 @@ function domain_xmlsitemap_xmlsitemap_context_fallback() {
 function domain_xmlsitemap_xmlsitemap_context_info() {
   $context['domain'] = array(
     'label' => t('Domain'),
-    //'summary callback' => 'locale_language_name',
-    'settings callback' => 'domain_xmlsitemap_xmlsitemap_domain_context_settings',
   );
   return $context;
 }
 
-function domain_xmlsitemap_xmlsitemap_domain_context_settings(stdClass $sitemap) {
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function domain_xmlsitemap_form_xmlsitemap_sitemap_edit_form_alter(&$form, $form_state) {
   $domains = domain_domains();
   $options = array();
   foreach ($domains as $domain) {
-  	$options[$domain['domain_id']] = $domain['path'];
+    $options[$domain['domain_id']] = $domain['path'];
   }
-  $form['domain'] = array(
+  $form['context']['domain'] = array(
     '#type' => 'select',
     '#title' => t('Domain'),
     '#options' => $options,
-    '#default_value' => issset($sitemap->context['domain']) ? $sitemap->context['domain'] : '',
+    '#default_value' => isset($form['#sitemap']['context']['domain']) ? $form['#sitemap']['context']['domain'] : '',
+    '#access' => !empty($options),
   );
-  return $form;
 }
