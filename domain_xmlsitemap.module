@@ -18,3 +18,21 @@ function domain_xmlsitemap_form_xmlsitemap_sitemap_edit_form_alter(&$form, $form
     '#access' => !empty($options),
   );
 }
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function xmlsitemap_domain_query_xmlsitemap_alter(QueryAlterableInterface $query) {
+  $context = $query->getMetaData('context');
+  if (!isset($context['domain'])) {
+    return;
+  }
+
+  // @todo Join here may cause duplicate records. Investigate using a subquery.
+  $query->leftJoin('domain_access', 'da', "x.type = 'node' AND x.nid = ta.id");
+  $query->fields('da', array('gid', 'realm'));
+  $or = db_or();
+  $or->condition('gid', $context['domain']);
+  $or->condition(db_and()->condition('gid', 0)->condition('realm', 'domain_site'));
+  $query->condition($or);
+}
