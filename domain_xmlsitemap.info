@@ -6,3 +6,4 @@ core = 7.x
 dependencies[] = xmlsitemap
 dependencies[] = domain
 files[] = domain_xmlsitemap.module
+files[] = domain_xmlsitemap.xmlsitemap.inc
