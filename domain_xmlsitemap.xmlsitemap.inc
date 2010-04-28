@@ -12,6 +12,7 @@
 function domain_xmlsitemap_xmlsitemap_context_info() {
   $context['domain'] = array(
     'label' => t('Domain'),
+    'default' => 0,
   );
   return $context;
 }
@@ -22,14 +23,6 @@ function domain_xmlsitemap_xmlsitemap_context_info() {
 function domain_xmlsitemap_xmlsitemap_context() {
   $domain = domain_get_domain();
   $context['domain'] = $domain['domain_id'];
-  return $context;
-}
-
-/**
- * Implements hook_xmlsitemap_context_fallback().
- */
-function domain_xmlsitemap_xmlsitemap_context_fallback() {
-  $context['domain'] = 0;
   return $context;
 }
 

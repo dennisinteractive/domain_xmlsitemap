@@ -33,9 +33,9 @@ function domain_xmlsitemap_form_xmlsitemap_sitemap_edit_form_alter(&$form, $form
 /**
  * Implements hook_query_TAG_alter().
  */
-function xmlsitemap_domain_query_xmlsitemap_alter(QueryAlterableInterface $query) {
-  $context = $query->getMetaData('context');
-  if (!isset($context['domain'])) {
+function domain_xmlsitemap_query_xmlsitemap_generate_alter(QueryAlterableInterface $query) {
+  $sitemap = $query->getMetaData('sitemap');
+  if (!isset($sitemap['context']['domain'])) {
     return;
   }
 
@@ -43,7 +43,7 @@ function xmlsitemap_domain_query_xmlsitemap_alter(QueryAlterableInterface $query
   $query->leftJoin('domain_access', 'da', "x.type = 'node' AND x.id = da.nid");
   $query->fields('da', array('gid', 'realm'));
   $or = db_or();
-  $or->condition('gid', $context['domain']);
+  $or->condition('gid', $sitemap['context']['domain']);
   $or->condition(db_and()->isNull('gid')->condition('gid', 0)->condition('realm', 'domain_site'));
   $query->condition($or);
 }
