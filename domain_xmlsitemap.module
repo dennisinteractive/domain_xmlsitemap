@@ -71,10 +71,16 @@ function domain_xmlsitemap_query_xmlsitemap_generate_alter(QueryAlterableInterfa
   }
 
   // @todo Join here may cause duplicate records. Investigate using a subquery.
-  $query->leftJoin('domain_access', 'da', "x.type = 'node' AND x.id = da.nid");
-  $query->fields('da', array('gid', 'realm'));
-  $or = db_or();
-  $or->condition('gid', $sitemap['context']['domain']);
-  $or->condition(db_and()->isNull('gid')->condition('gid', 0)->condition('realm', 'domain_site'));
-  $query->condition($or);
+  $domain_alias = $query->leftJoin('domain_access', 'da', "x.type = 'node' AND x.id = da.nid");
+  $domain_condition = db_or();
+  $domain_condition->isNull('da.gid');
+  $domain_condition->condition(db_and()
+    ->condition("{$domain_alias}.gid", 0)
+    ->condition("{$domain_alias}.realm", 'domain_site')
+  );
+  $domain_condition->condition(db_and()
+    ->condition("{$domain_alias}.gid", $sitemap['context']['domain'])
+    ->condition("{$domain_alias}.realm", 'domain_id')
+  );
+  $query->condition($domain_condition);
 }
