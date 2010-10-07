@@ -27,12 +27,14 @@ function domain_xmlsitemap_xmlsitemap_context() {
 }
 
 /**
- * Implements hook_xmlsitemap_sitemap_uri_alter().
+ * Implements hook_xmlsitemap_context_url_options().
  */
-function domain_xmlsitemap_xmlsitemap_sitemap_uri_alter(&$path, array &$options, stdClass $sitemap) {
-  if (isset($sitemap->context['domain']) && $domain = domain_load($sitemap->context['domain'])) {
+function domain_xmlsitemap_xmlsitemap_context_url_options(array $context) {
+  $options = array();
+  if (isset($context['domain']) && $domain = domain_load($context['domain'])) {
     $options['base_url'] = rtrim($domain['path'], '/');
   }
+  return $options;
 }
 
 /**
@@ -67,12 +69,22 @@ function domain_xmlsitemap_query_xmlsitemap_generate_alter(QueryAlterableInterfa
   $domain_condition = db_or();
   $domain_condition->isNull('da.gid');
   $domain_condition->condition(db_and()
-    ->condition("{$domain_alias}.gid", 0)
-    ->condition("{$domain_alias}.realm", 'domain_site')
+    ->condition('da.gid', 0)
+    ->condition('da.realm', 'domain_site')
   );
   $domain_condition->condition(db_and()
-    ->condition("{$domain_alias}.gid", $sitemap->context['domain'])
-    ->condition("{$domain_alias}.realm", 'domain_id')
+    ->condition('da.gid', $sitemap->context['domain'])
+    ->condition('da.realm', 'domain_id')
   );
   $query->condition($domain_condition);
+
+  // If the domain source module is enabled, we need to add a check against
+  // the {domain_source} table as well.
+  if (module_exists('domain_source')) {
+    $domain_source = $query->leftJoin('domain_source', 'ds', "x.type = 'node' AND x.id = ds.nid");
+    $source_condition = db_or();
+    $source_condition->isNull('ds.domain_id');
+    $source_condition->condition('ds.domain_id', array(DOMAIN_SOURCE_USE_ACTIVE, $sitemap->context['domain']));
+    $query->condition($source_condition);
+  }
 }
