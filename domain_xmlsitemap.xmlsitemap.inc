@@ -21,7 +21,7 @@ function domain_xmlsitemap_xmlsitemap_context_info() {
  */
 function domain_xmlsitemap_xmlsitemap_context() {
   $domain = domain_get_domain();
-  $context['domain'] = $domain['domain_id'];
+  $context['domain'] = (string) $domain['domain_id'];
   return $context;
 }
 
