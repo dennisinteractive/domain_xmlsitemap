@@ -22,3 +22,68 @@ function domain_xmlsitemap_help($route_name, RouteMatchInterface $route_match) {
     default:
   }
 }
+
+/**
+ * Implements hook_xmlsitemap_context_info().
+ */
+function domain_xmlsitemap_xmlsitemap_context_info() {
+  $info['domain'] = [
+    'label' => t('Domain'),
+    'default' => 0,
+  ];
+  return $info;
+}
+
+/**
+ * Implements hook_xmlsitemap_context().
+ */
+function domain_xmlsitemap_xmlsitemap_context() {
+  $context = [];
+  $context['domain'] = \Drupal::service('domain.negotiator')->getActiveId();
+  return $context;
+}
+
+/**
+ * Implements hook_xmlsitemap_context_url_options().
+ */
+function domain_xmlsitemap_xmlsitemap_context_url_options(array $context) {
+  $options = [];
+  if (isset($context['domain']) && $domain = \Drupal::service('domain.loader')->load($context['domain'])) {
+    $options['base_url'] = $domain->getPath();
+  }
+  return $options;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function domain_xmlsitemap_form_xmlsitemap_sitemap_edit_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+
+  $domains = \Drupal::service('domain.loader')->loadMultipleSorted();
+  $options = [];
+  foreach ($domains as $domain) {
+    $options[$domain->getDomainId()] = $domain->getPath();
+  }
+  if ($entity = $form_state->getFormObject()->getEntity()) {
+    $default = $entity->getContext()['domain'];
+  }
+  else {
+    $default = 0;
+  }
+  $form['context']['domain'] = [
+    '#type' => 'select',
+    '#title' => t('Domain'),
+    '#options' => $options,
+    '#default_value' => $default,
+    '#access' => !empty($options),
+  ];
+}
+
+/**
+ * Implements hook_xmlsitemap_link_alter().
+ */
+function domain_xmlsitemap_xmlsitemap_link_alter(&$link) { //var_dump($link);
+  if ($link['type'] == 'mymodule') {
+    $link['priority'] += 0.5;
+  }
+}
