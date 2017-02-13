@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains domain_xmlsitemap.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function domain_xmlsitemap_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the domain_xmlsitemap module.
+    case 'help.page.domain_xmlsitemap':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Provides domain contexts for XML sitemaps.') . '</p>';
+      return $output;
+
+    default:
+  }
+}

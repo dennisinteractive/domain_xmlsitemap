@@ -1,0 +1,14 @@
+{
+  "name": "dennis/domain_xmlsitemap",
+  "type": "drupal-module",
+  "description": "Provides domain contexts for XML sitemaps.",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://github.com/dennisinteractive/domain_xmlsitemap",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://github.com/dennisinteractive/domain_xmlsitemap/issues",
+    "source": "https://github.com/dennisinteractive/domain_xmlsitemap"
+  },
+  "require": { }
+}

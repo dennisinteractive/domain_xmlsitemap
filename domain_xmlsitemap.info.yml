@@ -1,0 +1,8 @@
+name: Domain XML sitemap
+type: module
+description: Provides domain contexts for XML sitemaps.
+core: 8.x
+package: Domain
+dependencies:
+  - xmlsitemap
+  - domain_access
