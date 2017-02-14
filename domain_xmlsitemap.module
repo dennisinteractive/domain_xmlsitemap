@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Database\Query\Condition;
 
 /**
  * Implements hook_help().
@@ -82,8 +83,31 @@ function domain_xmlsitemap_form_xmlsitemap_sitemap_edit_form_alter(&$form, \Drup
 /**
  * Implements hook_xmlsitemap_link_alter().
  */
-function domain_xmlsitemap_xmlsitemap_link_alter(&$link) { //var_dump($link);
+function domain_xmlsitemap_xmlsitemap_link_alter(&$link) {
+  //error_log(print_r($link,1), 0);
   if ($link['type'] == 'mymodule') {
     $link['priority'] += 0.5;
   }
+}
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function domain_xmlsitemap_query_xmlsitemap_generate_alter(Drupal\Core\Database\Query\AlterableInterface $query) {
+
+  $sitemap = $query->getMetaData('sitemap');
+  if (!isset($sitemap->context['domain'])) {
+    return;
+  }
+
+  //var_dump($sitemap->context['domain']);
+  //debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+
+
+  $query->leftJoin('node_access', 'na', "x.type = 'node' AND x.id = na.nid");
+  $and = new Condition('AND');
+  $and->condition('na.gid', $sitemap->context['domain'])
+    ->condition('na.realm', 'domain_id');
+  $query->condition($and);
+
 }
