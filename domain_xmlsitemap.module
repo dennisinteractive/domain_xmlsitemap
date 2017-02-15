@@ -100,14 +100,17 @@ function domain_xmlsitemap_query_xmlsitemap_generate_alter(Drupal\Core\Database\
     return;
   }
 
-  //var_dump($sitemap->context['domain']);
-  //debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-
-
+  // Let domain_access, via node_access control whether nodes can be seen.
   $query->leftJoin('node_access', 'na', "x.type = 'node' AND x.id = na.nid");
-  $and = new Condition('AND');
-  $and->condition('na.gid', $sitemap->context['domain'])
+
+  // Remove the existing x.access condition.
+  $where =& $query->conditions();
+  unset($where[0]);
+
+  // Restrict results to the domain in the context.
+  $node_access = new Condition('AND');
+  $node_access->condition('na.gid', $sitemap->context['domain'])
     ->condition('na.realm', 'domain_id');
-  $query->condition($and);
+  $query->condition($node_access);
 
 }
