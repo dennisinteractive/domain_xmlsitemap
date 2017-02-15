@@ -7,6 +7,9 @@
 
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Database\Query\Condition;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Database\Query\AlterableInterface;
 
 /**
  * Implements hook_help().
@@ -43,7 +46,7 @@ function domain_xmlsitemap_xmlsitemap_context() {
   $active_id = \Drupal::service('domain.negotiator')->getActiveId();
   // Ensure it's a valid domain, and cache it.
   $domain = \Drupal::service('domain.loader')->load($active_id);
-  if ($domain instanceof \Drupal\Core\Entity\EntityInterface) {
+  if ($domain instanceof EntityInterface) {
     $context['domain'] = $active_id;
   }
   return $context;
@@ -56,7 +59,7 @@ function domain_xmlsitemap_xmlsitemap_context_url_options(array $context) {
   $options = [];
   if (isset($context['domain'])) {
     $domain = \Drupal::service('domain.loader')->load($context['domain']);
-    if ($domain instanceof \Drupal\Core\Entity\EntityInterface) {
+    if ($domain instanceof EntityInterface) {
       $options['base_url'] = $domain->getPath();
     }
   }
@@ -66,7 +69,7 @@ function domain_xmlsitemap_xmlsitemap_context_url_options(array $context) {
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function domain_xmlsitemap_form_xmlsitemap_sitemap_edit_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+function domain_xmlsitemap_form_xmlsitemap_sitemap_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $domains = \Drupal::service('domain.loader')->loadMultipleSorted();
   $options = [];
   foreach ($domains as $domain) {
@@ -90,7 +93,7 @@ function domain_xmlsitemap_form_xmlsitemap_sitemap_edit_form_alter(&$form, \Drup
 /**
  * Implements hook_query_TAG_alter().
  */
-function domain_xmlsitemap_query_xmlsitemap_generate_alter(Drupal\Core\Database\Query\AlterableInterface $query) {
+function domain_xmlsitemap_query_xmlsitemap_generate_alter(AlterableInterface $query) {
 
   $sitemap = $query->getMetaData('sitemap');
   if (!isset($sitemap->context['domain'])) {
@@ -99,7 +102,7 @@ function domain_xmlsitemap_query_xmlsitemap_generate_alter(Drupal\Core\Database\
 
   // Get the domain from the context.
   $domain = \Drupal::service('domain.loader')->load($sitemap->context['domain']);
-  if (!($domain instanceof \Drupal\Core\Entity\EntityInterface)) {
+  if (!($domain instanceof EntityInterface)) {
     return;
   }
 

@@ -4,5 +4,5 @@ description: Provides domain contexts for XML sitemaps.
 core: 8.x
 package: Domain
 dependencies:
-  - xmlsitemap
-  - domain_access
+  - drupal:xmlsitemap
+  - drupal:domain_access
