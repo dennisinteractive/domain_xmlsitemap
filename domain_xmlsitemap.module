@@ -40,7 +40,12 @@ function domain_xmlsitemap_xmlsitemap_context_info() {
  */
 function domain_xmlsitemap_xmlsitemap_context() {
   $context = [];
-  $context['domain'] = \Drupal::service('domain.negotiator')->getActiveId();
+  $active_id = \Drupal::service('domain.negotiator')->getActiveId();
+  // Ensure it's a valid domain, and cache it.
+  $domain = \Drupal::service('domain.loader')->load($active_id);
+  if ($domain instanceof \Drupal\Core\Entity\EntityInterface) {
+    $context['domain'] = $active_id;
+  }
   return $context;
 }
 
@@ -49,8 +54,11 @@ function domain_xmlsitemap_xmlsitemap_context() {
  */
 function domain_xmlsitemap_xmlsitemap_context_url_options(array $context) {
   $options = [];
-  if (isset($context['domain']) && $domain = \Drupal::service('domain.loader')->load($context['domain'])) {
-    $options['base_url'] = $domain->getPath();
+  if (isset($context['domain'])) {
+    $domain = \Drupal::service('domain.loader')->load($context['domain']);
+    if ($domain instanceof \Drupal\Core\Entity\EntityInterface) {
+      $options['base_url'] = $domain->getPath();
+    }
   }
   return $options;
 }
@@ -59,11 +67,10 @@ function domain_xmlsitemap_xmlsitemap_context_url_options(array $context) {
  * Implements hook_form_FORM_ID_alter().
  */
 function domain_xmlsitemap_form_xmlsitemap_sitemap_edit_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
-
   $domains = \Drupal::service('domain.loader')->loadMultipleSorted();
   $options = [];
   foreach ($domains as $domain) {
-    $options[$domain->getDomainId()] = $domain->getPath();
+    $options[$domain->Id()] = $domain->getPath();
   }
   if ($entity = $form_state->getFormObject()->getEntity()) {
     $default = $entity->getContext()['domain'];
@@ -81,22 +88,18 @@ function domain_xmlsitemap_form_xmlsitemap_sitemap_edit_form_alter(&$form, \Drup
 }
 
 /**
- * Implements hook_xmlsitemap_link_alter().
- */
-function domain_xmlsitemap_xmlsitemap_link_alter(&$link) {
-  //error_log(print_r($link,1), 0);
-  if ($link['type'] == 'mymodule') {
-    $link['priority'] += 0.5;
-  }
-}
-
-/**
  * Implements hook_query_TAG_alter().
  */
 function domain_xmlsitemap_query_xmlsitemap_generate_alter(Drupal\Core\Database\Query\AlterableInterface $query) {
 
   $sitemap = $query->getMetaData('sitemap');
   if (!isset($sitemap->context['domain'])) {
+    return;
+  }
+
+  // Get the domain from the context.
+  $domain = \Drupal::service('domain.loader')->load($sitemap->context['domain']);
+  if (!($domain instanceof \Drupal\Core\Entity\EntityInterface)) {
     return;
   }
 
@@ -109,7 +112,7 @@ function domain_xmlsitemap_query_xmlsitemap_generate_alter(Drupal\Core\Database\
 
   // Restrict results to the domain in the context.
   $node_access = new Condition('AND');
-  $node_access->condition('na.gid', $sitemap->context['domain'])
+  $node_access->condition('na.gid', $domain->getDomainId())
     ->condition('na.realm', 'domain_id');
   $query->condition($node_access);
 
