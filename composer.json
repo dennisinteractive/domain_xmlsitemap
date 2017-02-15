@@ -1,5 +1,5 @@
 {
-  "name": "dennis/domain_xmlsitemap",
+  "name": "dennisdigital/domain_xmlsitemap",
   "type": "drupal-module",
   "description": "Provides domain contexts for XML sitemaps.",
   "keywords": ["Drupal"],
