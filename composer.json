@@ -11,6 +11,6 @@
     "source": "http://cgit.drupalcode.org/domain_xmlsitemap"
   },
   "require": {
-    "drupal/xmlsitemap": "1.0-alpha2"
+    "drupal/xmlsitemap": "dev-8.x-1.x#24c8474a8dcd682f426865302c85f7b15aae8c59"
   }
 }
