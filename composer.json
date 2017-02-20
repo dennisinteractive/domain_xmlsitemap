@@ -10,5 +10,7 @@
     "issues": "https://www.drupal.org/project/issues/domain_xmlsitemap",
     "source": "http://cgit.drupalcode.org/domain_xmlsitemap"
   },
-  "require": { }
+  "require": {
+    "drupal/xmlsitemap": "1.0-alpha2"
+  }
 }
