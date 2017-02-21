@@ -60,7 +60,7 @@ function domain_xmlsitemap_xmlsitemap_context_url_options(array $context) {
   if (isset($context['domain'])) {
     $domain = \Drupal::service('domain.loader')->load($context['domain']);
     if ($domain instanceof EntityInterface) {
-      $options['base_url'] = $domain->getPath();
+      $options['base_url'] = trim($domain->getPath(), '/');
     }
   }
   return $options;
