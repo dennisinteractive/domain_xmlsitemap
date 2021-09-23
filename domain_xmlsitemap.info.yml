@@ -1,7 +1,7 @@
 name: Domain XML sitemap
 type: module
 description: Provides domain contexts for XML sitemaps.
-core: 8.x
+core_version_requirement: ^8 || ^9 || ^10
 package: Domain
 dependencies:
   - drupal:xmlsitemap
