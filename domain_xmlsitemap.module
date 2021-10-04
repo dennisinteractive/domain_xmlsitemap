@@ -44,8 +44,10 @@ function domain_xmlsitemap_xmlsitemap_context_info() {
 function domain_xmlsitemap_xmlsitemap_context() {
   $context = [];
   $active_id = \Drupal::service('domain.negotiator')->getActiveId();
+  /** @var \Drupal\Core\Entity\EntityTypeManagerInterface  $entity_type_manager */
+  $entity_type_manager = \Drupal::service('entity_type.manager');
   // Ensure it's a valid domain, and cache it.
-  $domain = \Drupal::service('domain.loader')->load($active_id);
+  $domain = $entity_type_manager->getStorage('domain')->load($active_id);
   if ($domain instanceof EntityInterface) {
     $context['domain'] = $active_id;
   }
@@ -58,7 +60,10 @@ function domain_xmlsitemap_xmlsitemap_context() {
 function domain_xmlsitemap_xmlsitemap_context_url_options(array $context) {
   $options = [];
   if (isset($context['domain'])) {
-    $domain = \Drupal::service('domain.loader')->load($context['domain']);
+    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface  $entity_type_manager */
+    $entity_type_manager = \Drupal::service('entity_type.manager');
+    // Ensure it's a valid domain, and cache it.
+    $domain = $entity_type_manager->getStorage('domain')->load($context['domain']);
     if ($domain instanceof EntityInterface) {
       $options['base_url'] = trim($domain->getPath(), '/');
     }
@@ -99,9 +104,10 @@ function domain_xmlsitemap_query_xmlsitemap_generate_alter(AlterableInterface $q
   if (!isset($sitemap->context['domain'])) {
     return;
   }
-
+  /** @var \Drupal\Core\Entity\EntityTypeManagerInterface  $entity_type_manager */
+  $entity_type_manager = \Drupal::service('entity_type.manager');
   // Get the domain from the context.
-  $domain = \Drupal::service('domain.loader')->load($sitemap->context['domain']);
+  $domain = $entity_type_manager->getStorage('domain')->load($sitemap->context['domain']);
   if (!($domain instanceof EntityInterface)) {
     return;
   }
